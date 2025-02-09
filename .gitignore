@@ -1,0 +1,5 @@
+vInvesmger/
+__pycache__/
+*.log
+*.csv
+*.db
