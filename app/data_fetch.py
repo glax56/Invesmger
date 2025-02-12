@@ -1,32 +1,28 @@
 import yfinance as yf
 import pandas as pd
+import os
 
-# Define tickers and date range
-tickers = ["AAPL", "MSFT", "GOOGL", "TSLA", "SPY", "BND"]
-start_date = "2015-01-01"
-end_date = "2025-01-01"
+def fetch_stock_data(tickers, start_date="2015-01-01", end_date="2025-01-01", save_csv=True):
+    """
+    Fetch historical close prices for given stock tickers.
+    """
+    print(f"Fetching stock data for: {tickers}")
+    try:
+        stock_data = yf.download(tickers, start=start_date, end=end_date)
+        
+        if "Close" in stock_data:
+            stock_data = stock_data["Close"]
+            print("Data fetched successfully!")
+        else:
+            print("Warning: 'Close' column not found.")
+        
+        if save_csv:
+            os.makedirs("data", exist_ok=True)
+            stock_data.to_csv("data/stock_data.csv")
+            print("Data saved to data/stock_data.csv")
 
-# Fetch data using yfinance
-print("Fetching stock data...")
-try:
-    stock_data = yf.download(tickers, start=start_date, end=end_date)
-    
-    # Print the full response structure
-    print("Raw Data Columns:", stock_data.columns)
+        return stock_data
 
-    # Check if "Adj Close" exists
-    if "Adj Close" in stock_data:
-        stock_data = stock_data["Adj Close"]
-        print("Data fetched successfully!")
-    else:
-        print("Warning: 'Adj Close' column not found. Displaying full data structure instead.")
-    
-except Exception as e:
-    print(f"Error fetching data: {e}")
-    stock_data = None
-
-# Display first few rows
-if stock_data is not None:
-    display(stock_data.head())  # Use display() for Jupyter Notebook
-else:
-    print("No stock data fetched.")
+    except Exception as e:
+        print(f"Error fetching stock data: {e}")
+        return None
